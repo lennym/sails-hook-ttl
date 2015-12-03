@@ -1,19 +1,28 @@
 {
   "name": "sails-hook-ttl",
   "version": "1.0.0",
-  "description": "",
+  "description": "Sets ttl properties on mongo models",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "eslint index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lennym/sails-hook-ttl.git"
   },
-  "author": "",
+  "author": "Leonard Martin <hello@lennym.co.uk>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/lennym/sails-hook-ttl/issues"
   },
-  "homepage": "https://github.com/lennym/sails-hook-ttl#readme"
+  "homepage": "https://github.com/lennym/sails-hook-ttl#readme",
+  "sails": {
+    "isHook": true
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3"
+  },
+  "dependencies": {
+    "async": "^1.5.0"
+  }
 }
