@@ -53,6 +53,14 @@ describe('sails-hook-ttl', function () {
 			hook(sails).initialize(done);
 		});
 
+		it('parse ttls as duration strings', function (done) {
+			sails.models.testmodel.ttl = '1h';
+			hook(sails).initialize(function () {
+				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ updatedAt: 1 }, { expireAfterSeconds: 3600 });
+				done();
+			});
+		});
+
 		it('throws an error if configured with non-numeric ttl', function (done) {
 			sails.models.testmodel.ttl = 'foo';
 			hook(sails).initialize(function (e) {
