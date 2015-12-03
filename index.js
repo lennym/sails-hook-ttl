@@ -39,10 +39,6 @@ module.exports = function ttl(sails) {
 
 	return {
 
-		defaults: {
-			__configKey__: {}
-		},
-
 		initialize: function (callback) {
 			sails.log.verbose('initializing model ttl');
 			sails.after('hook:orm:loaded', function () {

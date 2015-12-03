@@ -30,7 +30,7 @@ The models will then have an index created to expire the record the configured t
 
 ### Advanced Configuration
 
-The ttl property on the model can also be set as an object to define if the lifesan of a record is measured from the last update or its creation.
+The ttl property on the model can also be set as an object to define if the lifespan of a record is measured from the last update or its creation.
 
 ```javascript
 module.exports = {
