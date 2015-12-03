@@ -38,11 +38,6 @@ describe('sails-hook-ttl', function () {
 
 		beforeEach(function () {
 			sails = {
-				config: {
-					ttl: {
-						testmodel: 1000
-					}
-				},
 				log: {
 					verbose: sinon.stub()
 				},
@@ -51,53 +46,45 @@ describe('sails-hook-ttl', function () {
 				},
 				after: sinon.stub().withArgs('hook:orm:loaded').yieldsAsync()
 			};
+			sails.models.testmodel.ttl = 100;
 		});
 
 		it('calls callback if no ttls are configured', function (done) {
-			sails.config.ttl = {};
-			hook(sails).initialize.call({ configKey: 'ttl' }, done);
-		});
-
-		it('throws an error if configured with unknown model', function (done) {
-			sails.config.ttl.unknown = 100;
-			hook(sails).initialize.call({ configKey: 'ttl' }, function (e) {
-				e.should.be.an.instanceOf(Error);
-				done();
-			});
+			hook(sails).initialize(done);
 		});
 
 		it('throws an error if configured with non-numeric ttl', function (done) {
-			sails.config.ttl.testmodel = 'foo';
-			hook(sails).initialize.call({ configKey: 'ttl' }, function (e) {
+			sails.models.testmodel.ttl = 'foo';
+			hook(sails).initialize(function (e) {
 				e.should.be.an.instanceOf(Error);
 				done();
 			});
 		});
 
 		it('throws an error if configured as object with non-numeric ttl', function (done) {
-			sails.config.ttl.testmodel = {
+			sails.models.testmodel.ttl = {
 				ttl: 'foo',
 				since: 'create'
 			};
-			hook(sails).initialize.call({ configKey: 'ttl' }, function (e) {
+			hook(sails).initialize(function (e) {
 				e.should.be.an.instanceOf(Error);
 				done();
 			});
 		});
 
 		it('creates an index with the configured properties on the table', function (done) {
-			hook(sails).initialize.call({ configKey: 'ttl' }, function () {
+			hook(sails).initialize(function () {
 				sails.models.testmodel.collection.createIndex.should.have.been.calledOnce;
-				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ updatedAt: 1 }, { expireAfterSeconds: 1000 });
+				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ updatedAt: 1 }, { expireAfterSeconds: 100 });
 				done();
 			});
 		});
 
 		it('can handle objects as configuration', function (done) {
-			sails.config.ttl.testmodel = {
+			sails.models.testmodel.ttl = {
 				ttl: 5000
 			};
-			hook(sails).initialize.call({ configKey: 'ttl' }, function () {
+			hook(sails).initialize(function () {
 				sails.models.testmodel.collection.createIndex.should.have.been.calledOnce;
 				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ updatedAt: 1 }, { expireAfterSeconds: 5000 });
 				done();
@@ -105,11 +92,11 @@ describe('sails-hook-ttl', function () {
 		});
 
 		it('can be configured to use createdAt as index property', function (done) {
-			sails.config.ttl.testmodel = {
+			sails.models.testmodel.ttl = {
 				ttl: 10000,
 				since: 'create'
 			};
-			hook(sails).initialize.call({ configKey: 'ttl' }, function () {
+			hook(sails).initialize(function () {
 				sails.models.testmodel.collection.createIndex.should.have.been.calledOnce;
 				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ createdAt: 1 }, { expireAfterSeconds: 10000 });
 				done();
@@ -117,19 +104,20 @@ describe('sails-hook-ttl', function () {
 		});
 
 		it('removes any existing createdAt and updatedAt indexes', function (done) {
-			hook(sails).initialize.call({ configKey: 'ttl' }, function () {
+			hook(sails).initialize(function () {
 				sails.models.testmodel.collection.dropIndex.should.have.been.calledWith({ createdAt: 1 });
 				sails.models.testmodel.collection.dropIndex.should.have.been.calledWith({ updatedAt: 1 });
 				done();
 			});
 		});
 
-		it('can handle multiple models', function () {
-			sails.config.ttl.anothermodel = {
+		it('can handle multiple models', function (done) {
+			sails.models.anothermodel = new Stubs.Model();
+			sails.models.anothermodel.ttl = {
 				ttl: 10000,
 				since: 'create'
 			};
-			hook(sails).initialize.call({ configKey: 'ttl' }, function () {
+			hook(sails).initialize(function () {
 				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ updatedAt: 1 }, { expireAfterSeconds: 100 });
 				sails.models.anothermodel.collection.createIndex.should.have.been.calledWith({ createdAt: 1 }, { expireAfterSeconds: 10000 });
 				done();

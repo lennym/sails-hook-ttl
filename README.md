@@ -12,24 +12,34 @@ Then the hook will automatically be bound into your project.
 
 ## Configuration
 
-Create a config file at ./config/ttl.js containing the following:
+To add a ttl onto a model, simply provide the lifespan of the model (in seconds) as a property of the model
 
 ```javascript
-module.exports.ttl = {
-	<modelname>: <ttl value in seconds>
+module.exports = {
+	connection: 'mongo',
+	tableName: 'tokens',
+	ttl: 3600,
+	attributes: {
+		...
+	},
+	...
 }
 ```
 
-The configured tables will then have an index created to expire the record the configured time after the last update.
+The models will then have an index created to expire the record the configured time after the last update.
 
-### Advanced configuration
+### Advanced Configuration
+
+The ttl property on the model can also be set as an object to define if the lifesan of a record is measured from the last update or its creation.
 
 ```javascript
-module.exports.ttl = {
-	<modelname>: {
+module.exports = {
+	...
+	ttl: {
 		ttl: <ttl value in seconds>,
 		since: 'create'
-	}
+	},
+	...
 }
 ```
 

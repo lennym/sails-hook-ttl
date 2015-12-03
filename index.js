@@ -22,6 +22,7 @@ module.exports = function ttl(sails) {
 			var index = {};
 			index[since] = 1;
 			collection.dropIndex({ createdAt: 1 })
+			.catch(function () {/* ignore index removal errors */})
 			.then(function () {
 				return collection.dropIndex({ updatedAt: 1 });
 			})
@@ -43,14 +44,15 @@ module.exports = function ttl(sails) {
 		},
 
 		initialize: function (callback) {
-			var config = sails.config[this.configKey];
+			sails.log.verbose('initializing model ttl');
 			sails.after('hook:orm:loaded', function () {
-				sails.log.verbose('initializing model ttl');
-				async.each(Object.keys(config), function (key, cb) {
-					var value = config[key],
+				async.each(Object.keys(sails.models), function (key, cb) {
+					var value = sails.models[key].ttl,
 						since = 'update',
 						ttl;
-					if (typeof value === 'number') {
+					if (!value) {
+						return cb();
+					} else if (typeof value === 'number') {
 						ttl = value;
 					} else if (typeof value === 'object' && typeof value.ttl === 'number') {
 						ttl = value.ttl
