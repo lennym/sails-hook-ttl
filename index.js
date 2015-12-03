@@ -56,7 +56,7 @@ module.exports = function ttl(sails) {
 						ttl = value.ttl
 						since = value.since || 'update';
 					} else {
-						cb(new Error('invalid ttl configuration for model ' + key));
+						return cb(new Error('invalid ttl configuration for model ' + key));
 					}
 					setTTL(key, ttl, sinceOptions[since], cb);
 				}, function (err) {
