@@ -9,19 +9,30 @@ module.exports = function ttl(sails) {
 
 	function setTTL(model, ttl, since, callback) {
 		sails.log.verbose('setting ttl on ' + model + ' collection to ' + ttl);
+
+		since = since || 'updatedAt';
+
+		//throw an error if the model does not exist
+		if (!sails.models[model]) {
+			return callback(new Error('Unknown model name: ' + model));
+		}
+
 		sails.models[model].native(function (err, collection) {
-			since = since || 'updatedAt';
 			if (err) { return callback(err); }
 			var index = {};
 			index[since] = 1;
-			collection.dropIndex({ createdAt: 1 }).then(function () {
+			collection.dropIndex({ createdAt: 1 })
+			.then(function () {
 				return collection.dropIndex({ updatedAt: 1 });
-			}).catch(function () {/* ignore index removal errors */})
+			})
+			.catch(function () {/* ignore index removal errors */})
 			.then(function () {
 				return collection.createIndex(index, { expireAfterSeconds: ttl });
-			}).then(function () {
+			})
+			.then(function () {
 				callback();
-			}).catch(callback);
+			})
+			.catch(callback);
 		});
 	}
 
