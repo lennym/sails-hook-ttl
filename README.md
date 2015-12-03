@@ -28,6 +28,8 @@ module.exports = {
 
 The models will then have an index created to expire the record the configured time after the last update.
 
+Models' TTL values can also be passed as a duration string - e.g. `'1d'`, `'2h30m'` etc (parsed using [parse-duration](https://npmjs.com/package/parse-duration))
+
 ### Advanced Configuration
 
 The ttl property on the model can also be set as an object to define if the lifespan of a record is measured from the last update or its creation.

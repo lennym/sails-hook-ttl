@@ -1,4 +1,5 @@
-var async = require('async');
+var async = require('async'),
+	parse = require('parse-duration');
 
 var sinceOptions = {
 	create: 'createdAt',
@@ -48,13 +49,17 @@ module.exports = function ttl(sails) {
 						ttl;
 					if (!value) {
 						return cb();
-					} else if (typeof value === 'number') {
+					} else if (typeof value === 'number' || typeof value === 'string') {
 						ttl = value;
-					} else if (typeof value === 'object' && typeof value.ttl === 'number') {
+					} else if (typeof value === 'object' && value.ttl) {
 						ttl = value.ttl
 						since = value.since || 'update';
-					} else {
-						return cb(new Error('invalid ttl configuration for model ' + key));
+					}
+					if (typeof ttl === 'string') {
+						ttl = parse(ttl) / 1000;
+					}
+					if (typeof ttl !== 'number' || isNaN(ttl)) {
+						cb(new Error('Invalid ttl value for model ' + key));
 					}
 					setTTL(key, ttl, sinceOptions[since], cb);
 				}, function (err) {
