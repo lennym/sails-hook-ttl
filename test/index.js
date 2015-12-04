@@ -144,6 +144,16 @@ describe('sails-hook-ttl', function () {
 			});
 		});
 
+		it('does nothing if model does not use mongo adapter', function (done) {
+			sails.models.testmodel.mongo = null;
+			hook(sails).initialize(function () {
+				sails.models.testmodel.collection.dropIndex.should.not.have.been.called;
+				sails.models.testmodel.collection.createIndex.should.not.have.been.called;
+				done();
+			});
+		});
+
+
 	});
 
 });

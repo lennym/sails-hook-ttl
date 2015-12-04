@@ -9,6 +9,10 @@ Model.prototype.native = function (callback) {
 	callback(null, this.collection);
 }
 
+Model.prototype.mongo = {
+	ObjectId: function() {}
+}
+
 function Collection() {
 	this.dropIndex.reset();
 	this.createIndex.reset();
