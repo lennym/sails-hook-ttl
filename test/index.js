@@ -38,6 +38,9 @@ describe('sails-hook-ttl', function () {
 
 		beforeEach(function () {
 			sails = {
+				config: {
+					models: { migrate: 'drop' }
+				},
 				log: {
 					verbose: sinon.stub()
 				},
@@ -128,6 +131,15 @@ describe('sails-hook-ttl', function () {
 			hook(sails).initialize(function () {
 				sails.models.testmodel.collection.createIndex.should.have.been.calledWith({ updatedAt: 1 }, { expireAfterSeconds: 100 });
 				sails.models.anothermodel.collection.createIndex.should.have.been.calledWith({ createdAt: 1 }, { expireAfterSeconds: 10000 });
+				done();
+			});
+		});
+
+		it('does nothing if model config is set to "safe"', function (done) {
+			sails.config.models.migrate = 'safe';
+			hook(sails).initialize(function () {
+				sails.models.testmodel.collection.dropIndex.should.not.have.been.called;
+				sails.models.testmodel.collection.createIndex.should.not.have.been.called;
 				done();
 			});
 		});

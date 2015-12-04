@@ -41,6 +41,10 @@ module.exports = function ttl(sails) {
 			sails.log.verbose('initializing model ttl');
 			sails.after('hook:orm:loaded', function () {
 
+				if (sails.config.models.migrate === 'safe') {
+					return callback();
+				}
+
 				Promise.each(Object.keys(sails.models), function (key, cb) {
 					var value = sails.models[key].ttl,
 						since = 'update',
