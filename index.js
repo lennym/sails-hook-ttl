@@ -46,6 +46,11 @@ module.exports = function ttl(sails) {
 				}
 
 				Promise.each(Object.keys(sails.models), function (key, cb) {
+
+					if(!sails.models[key].mongo || typeof sails.models[key].native !== 'function') {
+						return;
+					}
+
 					var value = sails.models[key].ttl,
 						since = 'update',
 						ttl;
